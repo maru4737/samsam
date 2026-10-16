@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#151228" />
+    <meta name="description" content="삼삼오오 모여 사진을 보고 5초 안에 이름을 맞히는 파티 게임" />
+    <title>삼삼오오 | 5초 사진 퀴즈</title>
+    <link rel="preconnect" href="https://ko.wikipedia.org" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="home-screen" class="screen home-screen" aria-labelledby="home-title">
+        <div class="hero-mark" aria-hidden="true"><span>3</span><span>3</span><span>5</span><span>5</span></div>
+        <p class="eyebrow">모이면 더 재밌는</p>
+        <h1 id="home-title">삼삼오오</h1>
+        <p class="intro">사진을 보고, 5초 안에 이름을 외쳐보세요!</p>
+
+        <div class="category-grid" role="radiogroup" aria-label="게임 종류 선택">
+          <button class="category-card selected" data-category="celebrity" role="radio" aria-checked="true">
+            <span class="card-emoji" aria-hidden="true">🎤</span>
+            <span><strong>연예인 이름 맞히기</strong><small>국내 스타 사진 퀴즈</small></span>
+          </button>
+          <button class="category-card" data-category="object" role="radio" aria-checked="false">
+            <span class="card-emoji" aria-hidden="true">🧰</span>
+            <span><strong>사물 이름 맞히기</strong><small>생활 속 물건 사진 퀴즈</small></span>
+          </button>
+        </div>
+
+        <div class="game-rule"><span aria-hidden="true">⏱</span> 한 판 10문제 · 문제당 5초</div>
+        <button id="start-button" class="primary-button">게임 시작 <span aria-hidden="true">→</span></button>
+        <p class="home-note">맞힌 정답은 진행자가 직접 눌러주세요.</p>
+      </section>
+
+      <section id="game-screen" class="screen game-screen is-hidden" aria-live="polite">
+        <header class="game-header">
+          <button id="exit-button" class="icon-button" aria-label="게임 나가기">×</button>
+          <div class="game-status"><span id="category-label">연예인 이름 맞히기</span><strong id="round-label">1 / 10</strong></div>
+          <div class="score-pill"><span>정답</span><strong id="score-label">0</strong></div>
+        </header>
+
+        <div class="timer-wrap" aria-label="남은 시간"><span id="timer-number">5</span><div class="timer-track"><div id="timer-bar"></div></div></div>
+        <div id="question-stage" class="question-stage loading">
+          <div id="question-image-wrap" class="question-image-wrap">
+            <img id="question-image" alt="문제 사진" />
+            <div id="object-visual" class="object-visual" aria-hidden="true"></div>
+          </div>
+          <p id="loading-text" class="loading-text">문제를 준비하고 있어요</p>
+          <div id="cover-layer" class="cover-layer is-hidden"><span>잠시 멈춤</span><small>계속하기를 누르면 이어집니다</small></div>
+        </div>
+
+        <div id="reveal-panel" class="reveal-panel is-hidden">
+          <p id="result-label" class="result-label">정답!</p>
+          <h2 id="answer-label">정답</h2>
+          <p id="accepted-label" class="accepted-label"></p>
+        </div>
+
+        <div class="game-actions">
+          <button id="correct-button" class="action-button correct"><span aria-hidden="true">✓</span> 정답!</button>
+          <button id="pass-button" class="action-button pass"><span aria-hidden="true">→</span> 패스</button>
+          <button id="pause-button" class="action-button pause"><span aria-hidden="true">Ⅱ</span> 일시정지</button>
+          <button id="next-button" class="action-button next is-hidden">다음 문제 <span aria-hidden="true">→</span></button>
+        </div>
+        <p class="shortcut-hint">Enter 정답 · Space 패스/다음 · P 일시정지</p>
+      </section>
+
+      <section id="result-screen" class="screen result-screen is-hidden" aria-labelledby="result-title">
+        <p class="eyebrow">한 판 끝!</p>
+        <h1 id="result-title">좋았어요! <span id="final-score">0</span>문제 정답</h1>
+        <p id="result-summary" class="intro">10문제 중 0문제를 맞혔어요.</p>
+        <div class="result-counts"><div><span>✓</span><strong id="correct-count">0</strong><small>정답</small></div><div><span>→</span><strong id="pass-count">0</strong><small>패스</small></div><div><span>⌛</span><strong id="timeout-count">0</strong><small>시간 초과</small></div></div>
+        <button id="again-button" class="primary-button">한 판 더 <span aria-hidden="true">↻</span></button>
+        <button id="home-button" class="text-button">게임 종류 바꾸기</button>
+      </section>
+
+      <div id="toast" class="toast" role="status"></div>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
