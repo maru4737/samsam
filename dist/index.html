@@ -4,78 +4,102 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#151228" />
-    <meta name="description" content="삼삼오오 모여 사진을 보고 5초 안에 이름을 맞히는 파티 게임" />
-    <title>삼삼오오 | 5초 사진 퀴즈</title>
-    <link rel="preconnect" href="https://ko.wikipedia.org" />
-    <link rel="stylesheet" href="./style.css" />
+    <meta name="description" content="사진을 보고 이름을 맞히는 삼삼오오 파티 게임" />
+    <title>삼삼오오 | 사진 퀴즈</title>
+    <link rel="stylesheet" href="./style.css?v=2.5.9" />
+    <link rel="stylesheet" href="./chat.css?v=2.5.9" />
   </head>
   <body>
     <main class="app-shell">
-      <section id="home-screen" class="screen home-screen" aria-labelledby="home-title">
+      <section id="landing-screen" class="screen landing-screen" aria-labelledby="home-title">
         <div class="hero-mark" aria-hidden="true"><span>3</span><span>3</span><span>5</span><span>5</span></div>
         <p class="eyebrow">모이면 더 재밌는</p>
         <h1 id="home-title">삼삼오오</h1>
-        <p class="intro">사진을 보고, 5초 안에 이름을 외쳐보세요!</p>
-
-        <div class="category-grid" role="radiogroup" aria-label="게임 종류 선택">
-          <button class="category-card selected" data-category="celebrity" role="radio" aria-checked="true">
-            <span class="card-emoji" aria-hidden="true">🎤</span>
-            <span><strong>연예인 이름 맞히기</strong><small>국내 스타 사진 퀴즈</small></span>
-          </button>
-          <button class="category-card" data-category="object" role="radio" aria-checked="false">
-            <span class="card-emoji" aria-hidden="true">🧰</span>
-            <span><strong>사물 이름 맞히기</strong><small>생활 속 물건 사진 퀴즈</small></span>
-          </button>
+        <p class="intro">사진을 보고 이름을 맞혀보세요!</p>
+        <div class="entry-grid">
+          <button id="open-single" class="entry-card" type="button"><span aria-hidden="true">🧩</span><strong>싱글 버전</strong><small>혼자 하거나 한 화면에 모여서</small></button>
+          <button id="open-battle" class="entry-card battle" type="button"><span aria-hidden="true">⚔️</span><strong>대결 버전</strong><small>방을 만들어 먼저 맞히기</small></button>
         </div>
-
-        <div class="game-rule"><span aria-hidden="true">⏱</span> 한 판 10문제 · 문제당 5초</div>
-        <button id="start-button" class="primary-button">게임 시작 <span aria-hidden="true">→</span></button>
-        <p class="home-note">맞힌 정답은 진행자가 직접 눌러주세요.</p>
+        <button id="sound-button" class="sound-button" type="button" aria-pressed="true"><span aria-hidden="true">🔊</span> 효과음 켜짐</button>
+        <a class="credits-link" href="./credits.html">사진 출처 보기</a>
       </section>
 
-      <section id="game-screen" class="screen game-screen is-hidden" aria-live="polite">
-        <header class="game-header">
-          <button id="exit-button" class="icon-button" aria-label="게임 나가기">×</button>
-          <div class="game-status"><span id="category-label">연예인 이름 맞히기</span><strong id="round-label">1 / 10</strong></div>
-          <div class="score-pill"><span>정답</span><strong id="score-label">0</strong></div>
-        </header>
-
-        <div class="timer-wrap" aria-label="남은 시간"><span id="timer-number">5</span><div class="timer-track"><div id="timer-bar"></div></div></div>
-        <div id="question-stage" class="question-stage loading">
-          <div id="question-image-wrap" class="question-image-wrap">
-            <img id="question-image" alt="문제 사진" />
-            <div id="object-visual" class="object-visual" aria-hidden="true"></div>
+      <section id="single-setup-screen" class="screen setup-screen is-hidden" aria-labelledby="single-setup-title">
+        <button class="back-button" data-go="landing" type="button">← 처음으로</button>
+        <p class="eyebrow">싱글 버전</p>
+        <h1 id="single-setup-title">어떤 문제로 할까요?</h1>
+        <div id="single-category-grid" class="category-grid version-grid" role="radiogroup" aria-label="문제 버전 선택">
+          <div class="person-category-row">
+            <button class="category-card selected" data-category="person" role="radio" aria-checked="true"><span class="card-emoji" aria-hidden="true">👤</span><span><strong>인물 버전</strong><small>연예인·역사 인물·캐릭터</small></span></button>
+            <div id="single-person-filter-wrap" class="person-filter-wrap"><label for="single-person-filter">인물 항목</label><select id="single-person-filter"><option value="person">전체 인물</option><option value="korean">국내 인물</option><option value="global">해외 인물</option><option value="character">만화·동화</option></select></div>
           </div>
-          <p id="loading-text" class="loading-text">문제를 준비하고 있어요</p>
-          <div id="cover-layer" class="cover-layer is-hidden"><span>잠시 멈춤</span><small>계속하기를 누르면 이어집니다</small></div>
+          <button class="category-card" data-category="object" role="radio" aria-checked="false"><span class="card-emoji" aria-hidden="true">🧰</span><span><strong>사물 버전</strong><small>생활용품·도구·음식</small></span></button>
+          <button class="category-card" data-category="mixed" role="radio" aria-checked="false"><span class="card-emoji" aria-hidden="true">🎲</span><span><strong>인물·사물 섞기</strong><small>모든 문제를 무작위로</small></span></button>
         </div>
-
-        <div id="reveal-panel" class="reveal-panel is-hidden">
-          <p id="result-label" class="result-label">정답!</p>
-          <h2 id="answer-label">정답</h2>
-          <p id="accepted-label" class="accepted-label"></p>
+        <p class="selector-label">어떻게 맞힐까요?</p>
+        <div id="single-mode-grid" class="mode-grid" role="radiogroup" aria-label="플레이 방식 선택">
+          <button class="mode-card selected" data-mode="typing" role="radio" aria-checked="true"><span aria-hidden="true">⌨️</span><strong>직접 입력하기</strong><small>키보드로 답 입력</small></button>
+          <button class="mode-card" data-mode="group" role="radio" aria-checked="false"><span aria-hidden="true">📣</span><strong>같이 외치기</strong><small>진행자가 정답을 판정</small></button>
         </div>
-
-        <div class="game-actions">
-          <button id="correct-button" class="action-button correct"><span aria-hidden="true">✓</span> 정답!</button>
-          <button id="pass-button" class="action-button pass"><span aria-hidden="true">→</span> 패스</button>
-          <button id="pause-button" class="action-button pause"><span aria-hidden="true">Ⅱ</span> 일시정지</button>
-          <button id="next-button" class="action-button next is-hidden">다음 문제 <span aria-hidden="true">→</span></button>
+        <div class="single-round-settings">
+          <div class="person-filter-wrap"><label for="single-round-count">문제 수</label><select id="single-round-count"><option value="5">5문제</option><option value="10" selected>10문제</option><option value="15">15문제</option><option value="20">20문제</option></select></div>
+          <div class="person-filter-wrap"><label for="single-question-seconds">문제당 시간</label><select id="single-question-seconds"><option value="3">3초</option><option value="5" selected>5초</option><option value="10">10초</option><option value="15">15초</option><option value="20">20초</option><option value="30">30초</option></select></div>
         </div>
-        <p class="shortcut-hint">Enter 정답 · Space 패스/다음 · P 일시정지</p>
+        <div class="game-rule"><span aria-hidden="true">⏱</span> <span id="single-rule-summary">한 판 10문제 · 문제당 5초</span></div>
+        <button id="single-start" class="primary-button" type="button" disabled>사진 불러오는 중</button>
       </section>
 
-      <section id="result-screen" class="screen result-screen is-hidden" aria-labelledby="result-title">
-        <p class="eyebrow">한 판 끝!</p>
-        <h1 id="result-title">좋았어요! <span id="final-score">0</span>문제 정답</h1>
-        <p id="result-summary" class="intro">10문제 중 0문제를 맞혔어요.</p>
-        <div class="result-counts"><div><span>✓</span><strong id="correct-count">0</strong><small>정답</small></div><div><span>→</span><strong id="pass-count">0</strong><small>패스</small></div><div><span>⌛</span><strong id="timeout-count">0</strong><small>시간 초과</small></div></div>
-        <button id="again-button" class="primary-button">한 판 더 <span aria-hidden="true">↻</span></button>
-        <button id="home-button" class="text-button">게임 종류 바꾸기</button>
+      <section id="single-game-screen" class="screen game-screen is-hidden" aria-live="polite">
+        <header class="game-header"><button id="single-exit" class="icon-button" aria-label="게임 나가기" type="button">×</button><div class="game-status"><span id="single-category-label">인물 버전 · 직접 입력하기</span><strong id="single-round-label">1 / 10</strong></div><div class="score-pill"><span>정답</span><strong id="single-score-label">0</strong></div><button id="game-sound-button" class="icon-button sound-icon" aria-label="효과음 끄기" aria-pressed="true" type="button">🔊</button></header>
+        <div id="single-progress" class="single-progress" aria-label="싱글 게임 진행 상황"><span>🎯 진행</span><strong>1 / 10 라운드</strong><em>정답 0개</em></div>
+        <div class="timer-wrap" aria-label="남은 시간"><span id="single-timer-number">5</span><div class="timer-track"><div id="single-timer-bar"></div></div></div>
+        <div id="single-question-stage" class="question-stage loading"><div class="question-image-wrap"><img id="single-question-image" alt="문제 사진" /></div><p id="single-loading-text" class="loading-text">문제를 준비하고 있어요</p><div class="image-error-panel"><strong>사진을 불러오지 못했어요</strong><small>다음 문제를 준비하고 있어요</small></div><div id="single-cover-layer" class="cover-layer is-hidden"><span>잠시 멈춤</span><small>계속하기를 누르면 이어집니다</small></div></div>
+        <div id="single-reveal-panel" class="reveal-panel is-hidden"><p id="single-result-label" class="result-label">정답!</p><h2 id="single-answer-label">정답</h2><p id="single-accepted-label" class="accepted-label"></p></div>
+        <form id="single-answer-form" class="answer-form is-hidden" autocomplete="off"><label class="sr-only" for="single-answer-input">정답 입력</label><input id="single-answer-input" name="answer" type="text" inputmode="text" maxlength="30" placeholder="정답을 입력하세요" autocapitalize="off" spellcheck="false" /><button type="submit">제출</button><p id="single-guess-feedback" aria-live="assertive"></p></form>
+        <div class="game-actions"><button id="single-correct" class="action-button correct" type="button">✓ 정답!</button><button id="single-pass" class="action-button pass" type="button">→ 패스</button><button id="single-pause" class="action-button pause" type="button">Ⅱ 일시정지</button><button id="single-next" class="action-button next is-hidden" type="button">다음 문제 →</button></div>
+        <p id="single-shortcut-hint" class="shortcut-hint">Enter 제출 · P 일시정지</p>
       </section>
 
+      <section id="single-result-screen" class="screen result-screen is-hidden" aria-labelledby="single-result-title"><p class="eyebrow">한 판 끝!</p><h1 id="single-result-title">좋았어요! <span id="single-final-score">0</span>문제 정답</h1><p id="single-result-summary" class="intro">10문제 중 0문제를 맞혔어요.</p><div class="result-counts"><div><span>✓</span><strong id="single-correct-count">0</strong><small>정답</small></div><div><span>→</span><strong id="single-pass-count">0</strong><small>패스</small></div><div><span>⌛</span><strong id="single-timeout-count">0</strong><small>시간 초과</small></div></div><button id="single-again" class="primary-button" type="button">한 판 더 ↻</button><button class="text-button" data-go="single-setup" type="button">문제 바꾸기</button></section>
+
+      <section id="battle-entry-screen" class="screen setup-screen is-hidden" aria-labelledby="battle-entry-title">
+        <button class="back-button" data-go="landing" type="button">← 처음으로</button>
+        <p class="eyebrow">대결 버전</p><h1 id="battle-entry-title">누가 먼저 맞힐까요?</h1><p class="intro">방에 모여 같은 사진을 보고 먼저 답을 입력하세요.</p>
+        <div class="entry-form"><label for="battle-nickname">내 닉네임</label><input id="battle-nickname" maxlength="12" autocomplete="nickname" placeholder="예: 민수" /><p id="battle-entry-feedback" class="form-feedback" aria-live="polite"></p></div>
+        <div class="battle-entry-actions"><button id="battle-create" class="primary-button" type="button">방 만들기</button><div class="join-row"><input id="battle-room-code" maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="방 코드" /><button id="battle-join" class="secondary-button" type="button">참가하기</button></div></div>
+      </section>
+
+      <section id="battle-lobby-screen" class="screen lobby-screen is-hidden" aria-labelledby="battle-room-title">
+        <header class="battle-header"><button id="battle-leave" class="icon-button" aria-label="방 나가기" type="button">×</button><div><span class="tiny-label">대결 방</span><h1 id="battle-room-title">방 코드</h1></div><button id="battle-copy-link" class="small-button" type="button">초대</button></header>
+        <p id="battle-lobby-notice" class="lobby-notice" aria-live="polite"></p>
+        <div id="battle-settings" class="battle-settings">
+          <p class="selector-label">문제 설정 <span id="battle-host-only">방장만 변경</span></p>
+          <div id="battle-category-grid" class="category-grid version-grid" role="radiogroup" aria-label="대결 문제 버전 선택">
+            <div class="person-category-row">
+              <button class="category-card selected" data-category="person" role="radio" aria-checked="true"><span class="card-emoji" aria-hidden="true">👤</span><span><strong>인물 버전</strong><small>연예인·역사 인물·캐릭터</small></span></button>
+              <div id="battle-person-filter-wrap" class="person-filter-wrap"><label for="battle-person-filter">인물 항목</label><select id="battle-person-filter"><option value="person">전체 인물</option><option value="korean">국내 인물</option><option value="global">해외 인물</option><option value="character">만화·동화</option></select></div>
+            </div>
+            <button class="category-card" data-category="object" role="radio" aria-checked="false"><span class="card-emoji" aria-hidden="true">🧰</span><span><strong>사물 버전</strong><small>생활용품·도구·음식</small></span></button>
+            <button class="category-card" data-category="mixed" role="radio" aria-checked="false"><span class="card-emoji" aria-hidden="true">🎲</span><span><strong>인물·사물 섞기</strong><small>모든 문제를 무작위로</small></span></button>
+          </div>
+          <div class="person-filter-wrap"><label for="battle-round-count">문제 수</label><select id="battle-round-count"><option value="5">5장</option><option value="10" selected>10장</option><option value="15">15장</option><option value="20">20장</option></select></div>
+        </div>
+        <div class="players-panel"><div class="players-heading"><strong>참가자</strong><span id="battle-player-count"></span></div><ul id="battle-player-list" class="player-list"></ul></div>
+        <div class="lobby-actions"><button id="battle-ready" class="secondary-button wide" type="button">준비하기</button><button id="battle-start" class="primary-button is-hidden" type="button">게임 시작</button></div>
+      </section>
+
+      <section id="battle-game-screen" class="screen battle-game-screen is-hidden" aria-live="polite">
+        <header class="game-header"><button id="battle-game-leave" class="icon-button" aria-label="방 나가기" type="button">×</button><div class="game-status"><span id="battle-category-label">대결 버전</span><strong id="battle-round-label">1 / 10</strong></div><div class="timer-mini"><span id="battle-timer-number">5</span></div><button id="battle-game-sound" class="icon-button sound-icon" aria-label="효과음 끄기" aria-pressed="true" type="button">🔊</button></header>
+        <div id="battle-leaderboard" class="battle-leaderboard" aria-live="polite"></div>
+        <div id="battle-scoreboard" class="scoreboard" aria-label="참가자 점수"></div>
+        <div id="battle-question-stage" class="question-stage loading"><div class="question-image-wrap"><img id="battle-question-image" alt="문제 사진" /></div><p id="battle-loading-text" class="loading-text">상대방을 기다리고 있어요</p><div class="image-error-panel"><strong>사진을 불러오지 못했어요</strong><small>다음 문제를 준비하고 있어요</small></div></div>
+        <div id="battle-reveal-panel" class="reveal-panel is-hidden"><p id="battle-result-label" class="result-label">정답!</p><h2 id="battle-answer-label">정답</h2><p id="battle-winner-label" class="accepted-label"></p></div>
+        <section id="battle-chat-panel" class="battle-chat-panel" aria-label="대결 채팅"><div class="battle-chat-heading"><strong>💬 대결 채팅</strong><span>정답은 바로 판정돼요</span></div><ol id="battle-chat-list" class="battle-chat-list" aria-live="polite" aria-label="대결 채팅 내용"></ol><form id="battle-answer-form" class="answer-form battle-chat-form" autocomplete="off"><label class="sr-only" for="battle-answer-input">채팅 또는 정답 입력</label><input id="battle-answer-input" name="answer" type="text" inputmode="text" maxlength="120" placeholder="정답 또는 채팅을 입력하세요" autocapitalize="off" spellcheck="false" disabled /><button id="battle-answer-submit" type="submit" disabled>보내기</button><p id="battle-guess-feedback" aria-live="assertive"></p></form></section>
+      </section>
+
+      <section id="battle-result-screen" class="screen result-screen is-hidden" aria-labelledby="battle-result-title"><p class="eyebrow">대결 종료</p><h1 id="battle-result-title">결과</h1><p id="battle-winner-summary" class="intro"></p><ol id="battle-ranking" class="ranking-list"></ol><button id="battle-rematch" class="primary-button is-hidden" type="button">같은 방에서 한 판 더</button><button id="battle-result-leave" class="text-button" type="button">메인으로</button></section>
       <div id="toast" class="toast" role="status"></div>
     </main>
-    <script src="./app.js"></script>
+    <script src="./app.js?v=2.5.9"></script>
   </body>
 </html>
