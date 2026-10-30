@@ -11,10 +11,10 @@
     toast: el('toast'), soundHome: el('sound-button'), soundSingle: el('game-sound-button'), soundBattle: el('battle-game-sound'),
     singleCategory: el('single-category-grid'), singlePersonWrap: el('single-person-filter-wrap'), singlePersonFilter: el('single-person-filter'), singleMode: el('single-mode-grid'), singleStart: el('single-start'),
     singleRounds: el('single-round-count'), singleSeconds: el('single-question-seconds'), singleRuleSummary: el('single-rule-summary'),
-    singleCategoryLabel: el('single-category-label'), singleRound: el('single-round-label'), singleScore: el('single-score-label'), singleProgress: el('single-progress'), singleTimer: el('single-timer-number'), singleTimerBar: el('single-timer-bar'), singleStage: el('single-question-stage'), singleImage: el('single-question-image'), singleLoading: el('single-loading-text'), singleCover: el('single-cover-layer'), singleReveal: el('single-reveal-panel'), singleResultLabel: el('single-result-label'), singleAnswerLabel: el('single-answer-label'), singleAccepted: el('single-accepted-label'), singleForm: el('single-answer-form'), singleInput: el('single-answer-input'), singleFeedback: el('single-guess-feedback'), singleCorrect: el('single-correct'), singlePass: el('single-pass'), singlePause: el('single-pause'), singleNext: el('single-next'), singleShortcut: el('single-shortcut-hint'),
+    singleCategoryLabel: el('single-category-label'), singleRound: el('single-round-label'), singleScore: el('single-score-label'), singleProgress: el('single-progress'), singleTimer: el('single-timer-number'), singleTimerBar: el('single-timer-bar'), singleStage: el('single-question-stage'), singleImage: el('single-question-image'), singleLoading: el('single-loading-text'), singleCover: el('single-cover-layer'), singleReport: el('single-report'), singleReveal: el('single-reveal-panel'), singleResultLabel: el('single-result-label'), singleAnswerLabel: el('single-answer-label'), singleAccepted: el('single-accepted-label'), singleForm: el('single-answer-form'), singleInput: el('single-answer-input'), singleFeedback: el('single-guess-feedback'), singleCorrect: el('single-correct'), singlePass: el('single-pass'), singlePause: el('single-pause'), singleNext: el('single-next'), singleShortcut: el('single-shortcut-hint'),
     singleFinalScore: el('single-final-score'), singleResultSummary: el('single-result-summary'), singleCorrectCount: el('single-correct-count'), singlePassCount: el('single-pass-count'), singleTimeoutCount: el('single-timeout-count'),
     battleNickname: el('battle-nickname'), battleCode: el('battle-room-code'), battleEntryFeedback: el('battle-entry-feedback'), battleRoomTitle: el('battle-room-title'), battleLobbyNotice: el('battle-lobby-notice'), battleSettings: el('battle-settings'), battleCategory: el('battle-category-grid'), battlePersonWrap: el('battle-person-filter-wrap'), battlePersonFilter: el('battle-person-filter'), battleRounds: el('battle-round-count'), battlePlayers: el('battle-player-list'), battlePlayerCount: el('battle-player-count'), battleReady: el('battle-ready'), battleStart: el('battle-start'),
-    battleCategoryLabel: el('battle-category-label'), battleRound: el('battle-round-label'), battleTimer: el('battle-timer-number'), battleLeader: el('battle-leaderboard'), battleScoreboard: el('battle-scoreboard'), battleStage: el('battle-question-stage'), battleImage: el('battle-question-image'), battleLoading: el('battle-loading-text'), battleReveal: el('battle-reveal-panel'), battleResultLabel: el('battle-result-label'), battleAnswerLabel: el('battle-answer-label'), battleWinner: el('battle-winner-label'), battleChatPanel: el('battle-chat-panel'), battleChatList: el('battle-chat-list'), battleForm: el('battle-answer-form'), battleInput: el('battle-answer-input'), battleSubmit: el('battle-answer-submit'), battleFeedback: el('battle-guess-feedback'), battleWinnerSummary: el('battle-winner-summary'), battleRanking: el('battle-ranking'), battleRematch: el('battle-rematch')
+    battleCategoryLabel: el('battle-category-label'), battleRound: el('battle-round-label'), battleTimer: el('battle-timer-number'), battleLeader: el('battle-leaderboard'), battleScoreboard: el('battle-scoreboard'), battleStage: el('battle-question-stage'), battleImage: el('battle-question-image'), battleLoading: el('battle-loading-text'), battleReport: el('battle-report'), battleReveal: el('battle-reveal-panel'), battleResultLabel: el('battle-result-label'), battleAnswerLabel: el('battle-answer-label'), battleWinner: el('battle-winner-label'), battleChatPanel: el('battle-chat-panel'), battleChatList: el('battle-chat-list'), battleForm: el('battle-answer-form'), battleInput: el('battle-answer-input'), battleSubmit: el('battle-answer-submit'), battleFeedback: el('battle-guess-feedback'), battleWinnerSummary: el('battle-winner-summary'), battleRanking: el('battle-ranking'), battleRematch: el('battle-rematch')
   });
 
   const labels = { person: '인물 버전', korean: '인물 버전 · 국내 인물', global: '인물 버전 · 해외 인물', character: '인물 버전 · 캐릭터', object: '사물 버전', mixed: '인물·사물 섞기' };
@@ -77,6 +77,24 @@
     ui.toast.textContent = message; ui.toast.classList.add('visible'); clearTimeout(toastTimer);
     toastTimer = setTimeout(() => ui.toast.classList.remove('visible'), 2300);
   };
+  const reportKey = (questionId) => `samsam-question-report-v1-${questionId}`;
+  function updateReportButton(button, question) {
+    const reported = Boolean(question?.id && sessionStorage.getItem(reportKey(question.id)));
+    button.disabled = !question?.id || reported;
+    button.classList.toggle('reported', reported);
+    button.textContent = reported ? '✓ 신고됨' : '🚩 문제 신고';
+  }
+  async function reportQuestion(question, source, button) {
+    if (!question?.id || button.disabled) return;
+    button.disabled = true; button.textContent = '신고 접수 중';
+    try {
+      const response = await fetch('./api/reports', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ questionId: question.id, source }) });
+      if (!response.ok) throw new Error('report request');
+      sessionStorage.setItem(reportKey(question.id), '1'); button.classList.add('reported'); button.textContent = '✓ 신고됨'; notify('문제 신고를 접수했어요. 검수 후 반영할게요.');
+    } catch (_) {
+      button.disabled = false; button.textContent = '🚩 문제 신고'; notify('신고를 보내지 못했어요. 잠시 후 다시 시도해 주세요.');
+    }
+  }
   const categoryFor = (version, personCategory) => version === 'person' ? personCategory : version;
   function avatarFor(player) {
     let hash = 0; for (const letter of String(player.id || player.nickname)) hash = (hash * 31 + letter.charCodeAt(0)) >>> 0;
@@ -240,7 +258,7 @@
   async function nextSingleQuestion() {
     if (!single) return; stopSingleTimer(); single.state = 'loading'; setSingleControls('loading'); resetSingleQuestionUi();
     const question = single.queue.shift(); if (!question) return endSingleGame();
-    single.question = question; single.roundIds.add(question.id); ui.singleRound.textContent = `${single.results.length + 1} / ${single.target}`; renderSingleProgress();
+    single.question = question; single.roundIds.add(question.id); updateReportButton(ui.singleReport, question); ui.singleRound.textContent = `${single.results.length + 1} / ${single.target}`; renderSingleProgress();
     const loaded = await preloadImage(question.image);
     if (!single || single.question !== question) return;
     if (!loaded) { single.roundIds.delete(question.id); single.failedIds.add(question.id); notify('문제가 있는 사진은 자동으로 건너뛰었어요.'); return nextSingleQuestion(); }
@@ -422,6 +440,7 @@
   }
   function renderBattleGame(room) {
     const match = room.match; const current = match?.image ? match : null; show('battle-game'); renderBattleScoreboard(room); renderBattleChat(room);
+    updateReportButton(ui.battleReport, current ? { id: match.questionId } : null);
     ui.battleCategoryLabel.textContent = battleVersionLabel(room.settings); ui.battleRound.textContent = `${match?.roundIndex || 1} / ${match?.targetRounds || ROUND_SIZE}`;
     const isNewRound = current && battleLastRoundId !== `${match.id}-${match.roundIndex}-${match.opensAt}`;
     if (isNewRound) { battleLastRoundId = `${match.id}-${match.roundIndex}-${match.opensAt}`; ui.battleInput.value = ''; ui.battleFeedback.textContent = ''; ui.battleReveal.classList.add('is-hidden'); }
@@ -500,6 +519,7 @@
   ui.singleRounds.addEventListener('change', updateSingleRules); ui.singleSeconds.addEventListener('change', updateSingleRules);
   ui.singleMode.addEventListener('click', (event) => { const button = event.target.closest('.mode-card'); if (!button) return; singleMode = button.dataset.mode; updateSingleModes(); });
   ui.singleStart.addEventListener('click', startSingleGame); ui.singleForm.addEventListener('submit', (event) => { event.preventDefault(); submitSingleAnswer(); }); ui.singleCorrect.addEventListener('click', correctSingleAndAdvance); ui.singlePass.addEventListener('click', () => revealSingle('pass')); ui.singlePause.addEventListener('click', pauseSingle); ui.singleNext.addEventListener('click', () => single && (single.results.length >= single.target ? endSingleGame() : nextSingleQuestion()));
+  ui.singleReport.addEventListener('click', () => reportQuestion(single?.question, 'single', ui.singleReport));
   el('single-again').addEventListener('click', startSingleGame); el('single-exit').addEventListener('click', () => { stopSingleTimer(); single = null; show('single-setup'); });
   el('battle-create').addEventListener('click', () => beginBattle({ type: 'room.create', settings: { category: 'person', personCategory: 'person' } }));
   el('battle-join').addEventListener('click', () => beginBattle({ type: 'room.join', roomCode: ui.battleCode.value.toUpperCase() }));
@@ -510,6 +530,7 @@
   ui.battlePersonFilter.addEventListener('change', () => sendBattleSettings({ personCategory: ui.battlePersonFilter.value }));
   ui.battleRounds.addEventListener('change', () => sendBattleSettings({ roundCount: Number(ui.battleRounds.value) }));
   ui.battleReady.addEventListener('click', () => { const me = getBattleMe(); if (me) sendBattle({ type: 'player.ready', ready: !me.ready }); }); ui.battleStart.addEventListener('click', () => sendBattle({ type: 'match.start' })); el('battle-leave').addEventListener('click', leaveBattle); el('battle-game-leave').addEventListener('click', leaveBattle); el('battle-result-leave').addEventListener('click', leaveBattle); el('battle-copy-link').addEventListener('click', copyBattleLink); ui.battleRematch.addEventListener('click', () => sendBattle({ type: 'match.rematch' }));
+  ui.battleReport.addEventListener('click', () => reportQuestion(battleRoom?.match?.questionId ? { id: battleRoom.match.questionId } : null, 'battle', ui.battleReport));
   ui.battleForm.addEventListener('compositionstart', () => { battleComposing = true; }); ui.battleForm.addEventListener('compositionend', () => { battleComposing = false; }); ui.battleForm.addEventListener('submit', (event) => { event.preventDefault(); if (battleComposing || !battleRoom?.match || ui.battleInput.disabled) return; const text = ui.battleInput.value.trim(); if (!text) return; ui.battleFeedback.textContent = ''; ui.battleInput.value = ''; battleFocusAfterSend = true; sendBattle({ type: 'chat.send', matchId: battleRoom.match.id, roundId: battleRoom.match.roundId, text }); });
   document.addEventListener('keydown', (event) => {
     if (event.repeat || !single || currentScreen !== 'single-game') return; const typing = document.activeElement === ui.singleInput && single.state === 'playing'; if (typing) return;

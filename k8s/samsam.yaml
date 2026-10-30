@@ -20,10 +20,16 @@ spec:
     spec:
       containers:
         - name: web
-          image: samsam/web:2.5.9
+          image: samsam/web:2.6.0
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+          env:
+            - name: REPORTS_PATH
+              value: /app/data/reports.jsonl
+          volumeMounts:
+            - name: question-reports
+              mountPath: /app/data
           readinessProbe:
             httpGet:
               path: /health/ready
@@ -37,6 +43,11 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
+      volumes:
+        - name: question-reports
+          hostPath:
+            path: /var/lib/samsam/question-reports
+            type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service

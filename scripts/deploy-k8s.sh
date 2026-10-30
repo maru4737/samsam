@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE_TAG="samsam/web:2.5.9"
+IMAGE_TAG="samsam/web:2.6.0"
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 sudo docker build --tag "$IMAGE_TAG" "$ROOT_DIR"

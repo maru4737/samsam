@@ -1,11 +1,12 @@
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
-import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
+import { appendFileSync, createReadStream, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve } from 'node:path';
 
 const PORT = Number(process.env.PORT || 8080);
 const ROOT = resolve(process.cwd(), 'dist');
 const QUESTIONS_PATH = join(ROOT, 'assets/questions.json');
+const REPORTS_PATH = process.env.REPORTS_PATH || resolve(process.cwd(), 'data', 'reports.jsonl');
 const DEFAULT_ROUND_SIZE = 10;
 const ROUND_OPTIONS = new Set([5, 10, 15, 20]);
 const ROUND_MS = 5000;
@@ -30,6 +31,7 @@ try {
   console.error('Unable to load question data', error);
   process.exit(1);
 }
+mkdirSync(resolve(REPORTS_PATH, '..'), { recursive: true });
 
 const normalizeAnswer = (value) => String(value || '').normalize('NFKC').toLowerCase().replace(/[\s·._-]/g, '');
 const cleanNickname = (value) => {
@@ -86,6 +88,31 @@ function questionById(questionId) {
   return questions.find((item) => item.id === questionId) || null;
 }
 
+function readRequestJson(request, maxBytes = 4096) {
+  return new Promise((resolve, reject) => {
+    let size = 0; let body = '';
+    request.setEncoding('utf8');
+    request.on('data', (chunk) => {
+      size += Buffer.byteLength(chunk);
+      if (size > maxBytes) { reject(new Error('too large')); request.destroy(); return; }
+      body += chunk;
+    });
+    request.on('end', () => {
+      try { resolve(JSON.parse(body || '{}')); } catch { reject(new Error('invalid json')); }
+    });
+    request.on('error', reject);
+  });
+}
+
+function saveQuestionReport(input) {
+  const question = questionById(input?.questionId);
+  const source = input?.source === 'battle' ? 'battle' : input?.source === 'single' ? 'single' : null;
+  if (!question || !source) return null;
+  const report = { id: id(), reportedAt: new Date().toISOString(), source, questionId: question.id, answer: question.answer, accepted: question.accepted || [], gameGroup: question.gameGroup, image: question.image };
+  appendFileSync(REPORTS_PATH, `${JSON.stringify(report)}\n`, { encoding: 'utf8', mode: 0o600 });
+  return report;
+}
+
 function playerPublic(player, room) {
   return {
     id: player.id,
@@ -130,6 +157,7 @@ function publicSnapshot(room) {
       deadline: current?.deadline || null,
       revealEndsAt: current?.revealEndsAt || null,
       image: current ? current.question.image : null,
+      questionId: current ? current.question.id : null,
       preloadImages,
       preloadVersion: match.preloadVersion,
       chat: match.chat,
@@ -514,11 +542,23 @@ function attachWebSocket(socket) {
   socket.on('close', () => onPeerClosed(peer));
 }
 
-const server = createServer((request, response) => {
+const server = createServer(async (request, response) => {
   const requestPath = (request.url || '/').split('?')[0];
   if (requestPath === '/health/live' || requestPath === '/health/ready') {
     response.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' });
     response.end(JSON.stringify({ ok: true, rooms: rooms.size, questions: questions.length }));
+    return;
+  }
+  if (requestPath === '/api/reports') {
+    if (request.method !== 'POST') { response.writeHead(405, { allow: 'POST' }); response.end(); return; }
+    try {
+      const report = saveQuestionReport(await readRequestJson(request));
+      if (!report) { response.writeHead(400, { 'content-type': 'application/json; charset=utf-8' }); response.end(JSON.stringify({ ok: false })); return; }
+      response.writeHead(201, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' }); response.end(JSON.stringify({ ok: true, id: report.id }));
+    } catch (error) {
+      console.error('Unable to save question report', error);
+      response.writeHead(400, { 'content-type': 'application/json; charset=utf-8' }); response.end(JSON.stringify({ ok: false }));
+    }
     return;
   }
   let decoded;

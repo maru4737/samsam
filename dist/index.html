@@ -8,6 +8,7 @@
     <title>삼삼오오 | 사진 퀴즈</title>
     <link rel="stylesheet" href="./style.css?v=2.5.9" />
     <link rel="stylesheet" href="./chat.css?v=2.5.9" />
+    <link rel="stylesheet" href="./report.css?v=2.6.0" />
   </head>
   <body>
     <main class="app-shell">
@@ -53,7 +54,7 @@
         <header class="game-header"><button id="single-exit" class="icon-button" aria-label="게임 나가기" type="button">×</button><div class="game-status"><span id="single-category-label">인물 버전 · 직접 입력하기</span><strong id="single-round-label">1 / 10</strong></div><div class="score-pill"><span>정답</span><strong id="single-score-label">0</strong></div><button id="game-sound-button" class="icon-button sound-icon" aria-label="효과음 끄기" aria-pressed="true" type="button">🔊</button></header>
         <div id="single-progress" class="single-progress" aria-label="싱글 게임 진행 상황"><span>🎯 진행</span><strong>1 / 10 라운드</strong><em>정답 0개</em></div>
         <div class="timer-wrap" aria-label="남은 시간"><span id="single-timer-number">5</span><div class="timer-track"><div id="single-timer-bar"></div></div></div>
-        <div id="single-question-stage" class="question-stage loading"><div class="question-image-wrap"><img id="single-question-image" alt="문제 사진" /></div><p id="single-loading-text" class="loading-text">문제를 준비하고 있어요</p><div class="image-error-panel"><strong>사진을 불러오지 못했어요</strong><small>다음 문제를 준비하고 있어요</small></div><div id="single-cover-layer" class="cover-layer is-hidden"><span>잠시 멈춤</span><small>계속하기를 누르면 이어집니다</small></div></div>
+        <div id="single-question-stage" class="question-stage loading"><div class="question-image-wrap"><img id="single-question-image" alt="문제 사진" /></div><button id="single-report" class="report-button" type="button" disabled>🚩 문제 신고</button><p id="single-loading-text" class="loading-text">문제를 준비하고 있어요</p><div class="image-error-panel"><strong>사진을 불러오지 못했어요</strong><small>다음 문제를 준비하고 있어요</small></div><div id="single-cover-layer" class="cover-layer is-hidden"><span>잠시 멈춤</span><small>계속하기를 누르면 이어집니다</small></div></div>
         <div id="single-reveal-panel" class="reveal-panel is-hidden"><p id="single-result-label" class="result-label">정답!</p><h2 id="single-answer-label">정답</h2><p id="single-accepted-label" class="accepted-label"></p></div>
         <form id="single-answer-form" class="answer-form is-hidden" autocomplete="off"><label class="sr-only" for="single-answer-input">정답 입력</label><input id="single-answer-input" name="answer" type="text" inputmode="text" maxlength="30" placeholder="정답을 입력하세요" autocapitalize="off" spellcheck="false" /><button type="submit">제출</button><p id="single-guess-feedback" aria-live="assertive"></p></form>
         <div class="game-actions"><button id="single-correct" class="action-button correct" type="button">✓ 정답!</button><button id="single-pass" class="action-button pass" type="button">→ 패스</button><button id="single-pause" class="action-button pause" type="button">Ⅱ 일시정지</button><button id="single-next" class="action-button next is-hidden" type="button">다음 문제 →</button></div>
@@ -92,7 +93,7 @@
         <header class="game-header"><button id="battle-game-leave" class="icon-button" aria-label="방 나가기" type="button">×</button><div class="game-status"><span id="battle-category-label">대결 버전</span><strong id="battle-round-label">1 / 10</strong></div><div class="timer-mini"><span id="battle-timer-number">5</span></div><button id="battle-game-sound" class="icon-button sound-icon" aria-label="효과음 끄기" aria-pressed="true" type="button">🔊</button></header>
         <div id="battle-leaderboard" class="battle-leaderboard" aria-live="polite"></div>
         <div id="battle-scoreboard" class="scoreboard" aria-label="참가자 점수"></div>
-        <div id="battle-question-stage" class="question-stage loading"><div class="question-image-wrap"><img id="battle-question-image" alt="문제 사진" /></div><p id="battle-loading-text" class="loading-text">상대방을 기다리고 있어요</p><div class="image-error-panel"><strong>사진을 불러오지 못했어요</strong><small>다음 문제를 준비하고 있어요</small></div></div>
+        <div id="battle-question-stage" class="question-stage loading"><div class="question-image-wrap"><img id="battle-question-image" alt="문제 사진" /></div><button id="battle-report" class="report-button" type="button" disabled>🚩 문제 신고</button><p id="battle-loading-text" class="loading-text">상대방을 기다리고 있어요</p><div class="image-error-panel"><strong>사진을 불러오지 못했어요</strong><small>다음 문제를 준비하고 있어요</small></div></div>
         <div id="battle-reveal-panel" class="reveal-panel is-hidden"><p id="battle-result-label" class="result-label">정답!</p><h2 id="battle-answer-label">정답</h2><p id="battle-winner-label" class="accepted-label"></p></div>
         <section id="battle-chat-panel" class="battle-chat-panel" aria-label="대결 채팅"><div class="battle-chat-heading"><strong>💬 대결 채팅</strong><span>정답은 바로 판정돼요</span></div><ol id="battle-chat-list" class="battle-chat-list" aria-live="polite" aria-label="대결 채팅 내용"></ol><form id="battle-answer-form" class="answer-form battle-chat-form" autocomplete="off"><label class="sr-only" for="battle-answer-input">채팅 또는 정답 입력</label><input id="battle-answer-input" name="answer" type="text" inputmode="text" maxlength="120" placeholder="정답 또는 채팅을 입력하세요" autocapitalize="off" spellcheck="false" disabled /><button id="battle-answer-submit" type="submit" disabled>보내기</button><p id="battle-guess-feedback" aria-live="assertive"></p></form></section>
       </section>
@@ -100,6 +101,6 @@
       <section id="battle-result-screen" class="screen result-screen is-hidden" aria-labelledby="battle-result-title"><p class="eyebrow">대결 종료</p><h1 id="battle-result-title">결과</h1><p id="battle-winner-summary" class="intro"></p><ol id="battle-ranking" class="ranking-list"></ol><button id="battle-rematch" class="primary-button is-hidden" type="button">같은 방에서 한 판 더</button><button id="battle-result-leave" class="text-button" type="button">메인으로</button></section>
       <div id="toast" class="toast" role="status"></div>
     </main>
-    <script src="./app.js?v=2.5.9"></script>
+    <script src="./app.js?v=2.6.0"></script>
   </body>
 </html>
